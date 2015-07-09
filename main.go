@@ -23,14 +23,14 @@ import (
 	facebookoauth "golang.org/x/oauth2/facebook"
 )
 
-var indexTemplate = template.Must(template.ParseFiles("templates/index.html"))
+var indexTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/index.html"))
 
 type indexTemplateVars struct {
 	Name        string
 	CalendarURL string
 }
 
-var errorTemplate = template.Must(template.ParseFiles("templates/error.html"))
+var errorTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/error.html"))
 
 type errorTemplateVars struct {
 	Code    int
