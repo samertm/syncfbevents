@@ -1,0 +1,7 @@
+# TOML file for syncfbevents
+# Rename to conf.toml.
+FacebookID = "111111111111111"
+FacebookSecret = "11111111111111111111111111111111"
+BaseURL = "http://localhost:8000"
+PGDATABASE = "syncfbevents"
+PGUSER = "samer"
