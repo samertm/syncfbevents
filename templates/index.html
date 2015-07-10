@@ -1,9 +1,13 @@
 {{define "body"}}
-<p>welcome to sync fb events yoooo</p>
-{{if .Name}}
-<p>Welcome, {{.Name}}.</p>
-<p><a href="{{.CalendarURL}}">View your calendar</a></p>
-{{else}}
-<p>Login with <a href="/login">Facebook</a>.</p>
-{{end}}{{/* if .Name */}}
+<div class="intro">
+  <div class="intro-body">
+    <p>welcome to sync fb events yoooo</p>
+    {{if .Name}}
+    <p>Welcome, {{.Name}}.</p>
+    <p><a href="{{.CalendarURL}}">View your calendar</a></p>
+    {{else}}
+    <p>Login with <a href="/login">Facebook</a>.</p>
+    {{end}}{{/* if .Name */}}
+  </div>
+</div>
 {{end}}{{/* define "body" */}}

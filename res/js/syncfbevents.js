@@ -1,0 +1,1 @@
+// syncfbevents.js -- script
