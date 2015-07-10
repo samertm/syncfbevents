@@ -1,3 +1,11 @@
 /* syncfbevents.css -- stylesheet */
 
+.calendar-links {
+    text-align: left;
+    margin: 0 auto;
+    width: 20%;
+}
 
+#cal-url {
+    text-align: center;
+}
