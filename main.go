@@ -28,16 +28,18 @@ func absoluteURL(urlFragment string) string {
 	return conf.Config.BaseURL + "/" + strings.TrimPrefix(urlFragment, "/")
 }
 
-// SAMER: Feed this into all of my templates.
+func initializeTemplate(file string) *template.Template {
+	return template.Must(template.ParseFiles("templates/layout.html", file))
+}
 
-var indexTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/index.html"))
+var indexTemplate = initializeTemplate("templates/index.html")
 
 type indexTemplateVars struct {
 	Name        string
 	CalendarURL string
 }
 
-var errorTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/error.html"))
+var errorTemplate = initializeTemplate("templates/error.html")
 
 type errorTemplateVars struct {
 	Code    int
@@ -51,7 +53,13 @@ func serveIndex(c web.C, w http.ResponseWriter, r *http.Request) error {
 	if u != nil {
 		v.Name = u.Name
 		// SAMER: Reverse router?
-		v.CalendarURL = fmt.Sprintf("/calendar/%s", u.FacebookID)
+		rawurl := absoluteURL(fmt.Sprintf("/calendar/%s", u.FacebookID))
+		calURL, err := url.Parse(rawurl)
+		if err != nil {
+			return err
+		}
+		calURL.Scheme = "webcal"
+		v.CalendarURL = calURL.String()
 	}
 	return indexTemplate.Execute(w, v)
 }
