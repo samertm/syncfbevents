@@ -5,7 +5,7 @@ serve:
 	syncfbevents
 
 watch-serve:
-	$(shell while true; do $(MAKE) serve & PID=$$! ; echo $$PID ; inotifywait -r -e close_write . ; kill $$PID ; done)
+	$(shell while true; do $(MAKE) serve & PID=$$! ; echo $$PID ; inotifywait --exclude ".git" -r -e close_write . ; kill $$PID ; done)
 
 deps:
 	go get github.com/codegangsta/gin
