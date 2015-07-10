@@ -16,6 +16,8 @@ Next:
 // SAMER: Remove timezone.
 // SAMER: Make unique on id. Or... do I have an off-by-one bug?
 
+Deploy on heroku?
+
 BEGIN:VEVENT
 ORGANIZER;CN=<Owner>:MAILTO:noreply@facebookmail.com
 DTSTART - either yyyymmdd or yyyymmddThhmmssZ converted to UTC
@@ -50,3 +52,7 @@ $ sudo systemctl start postgresql
 $ sudo systemctl enable postgresql
 $ sudo -i -u postgres createuser --interactive <your-system-username>
 $ createdb syncfbevents
+
+# LICENSE
+
+The license for this project is AGPLv3.
