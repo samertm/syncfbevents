@@ -1,13 +1,33 @@
 {{define "body"}}
-<div class="intro">
+<header class="intro">
   <div class="intro-body">
-    <p>welcome to sync fb events yoooo</p>
-    {{if .Name}}
-    <p>Welcome, {{.Name}}.</p>
-    <p><a href="{{.CalendarURL}}">View your calendar</a></p>
-    {{else}}
-    <p>Login with <a href="/login">Facebook</a>.</p>
-    {{end}}{{/* if .Name */}}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <p>Sync only the Facebook events you are attending (not events that you are invited to) with your Google Calendar, Outlook, Yahoo Calendar, etc.</p>
+          <p>This site is not affiliated with Facebook.</p>
+          {{if .Name}}
+          <p>Welcome, {{.Name}}.</p>
+        </div><!-- col -->
+      </div><!-- row -->
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="form-group">
+            <div class="input-group">
+              <input id="cal-url" class="form-control" type="text" readonly="readonly" value="{{.CalendarURL}}" >
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" data-copied-hint="Copied!" aria-label="Copy to clipboard">
+                  <span class="octicon octicon-clippy"></span>
+                </button>
+              </span>
+            </div>
+            {{else}}
+            <p>Login with <a href="/login">Facebook</a>.</p>
+            {{end}}{{/* if .Name */}}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</header>
 {{end}}{{/* define "body" */}}

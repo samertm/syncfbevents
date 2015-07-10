@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"text/template"
 	"time"
 
@@ -22,6 +23,12 @@ import (
 	"golang.org/x/oauth2"
 	facebookoauth "golang.org/x/oauth2/facebook"
 )
+
+func absoluteURL(urlFragment string) string {
+	return conf.Config.BaseURL + "/" + strings.TrimPrefix(urlFragment, "/")
+}
+
+// SAMER: Feed this into all of my templates.
 
 var indexTemplate = template.Must(template.ParseFiles("templates/layout.html", "templates/index.html"))
 
