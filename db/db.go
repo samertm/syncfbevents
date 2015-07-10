@@ -8,7 +8,7 @@ import (
 	"github.com/samertm/syncfbevents/conf"
 )
 
-var DB *sqlx.DB = sqlx.MustConnect("postgres", fmt.Sprintf("sslmode=disable dbname=%s user=%s", conf.Config.PGDATABASE, conf.Config.PGUSER))
+var DB *sqlx.DB = sqlx.MustConnect("postgres", conf.Config.PostgresDataSource)
 
 type Binder struct {
 	Len   int

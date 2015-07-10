@@ -1,3 +1,5 @@
 bower_components/
 conf.toml
+conf.dev.toml
+conf.prod.toml
 *.test

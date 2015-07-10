@@ -3,5 +3,4 @@
 FacebookID = "111111111111111"
 FacebookSecret = "11111111111111111111111111111111"
 BaseURL = "http://localhost:8000"
-PGDATABASE = "syncfbevents"
-PGUSER = "samer"
+PostgresDataSource = "sslmode=disable dbname=sfe user=sfe"
