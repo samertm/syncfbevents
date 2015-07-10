@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -44,12 +43,10 @@ func GetCreateUser(name, fbID string) (User, error) {
 	u, err := GetUser(UserSpec{FacebookID: fbID})
 	if err == nil {
 		// User exists, return them.
-		log.Println("ONE")
 		return u, nil
 	}
 	// Create the user and then get them.
 	if err := CreateUser(name, fbID); err != nil {
-		log.Println("TWO")
 		return User{}, err
 	}
 	// Get the user one last time.
