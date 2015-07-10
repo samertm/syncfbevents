@@ -1,22 +1,6 @@
 # Sync FB Events
 
-Let's get this to work.
-
-Next:
- - [x] Barf out the events somewhere.
- - [ ] Create a webcal link for the events.
- - [ ] Sync them with Google Calendar.
-
-# Notes
-
-// do I need time.ParseInLocation?
-// StartTime:2015-07-21T19:30:00-0700
-// StartTime:2025-12-29
-
-// SAMER: Remove timezone.
-// SAMER: Make unique on id. Or... do I have an off-by-one bug?
-
-Deploy on heroku?
+# Notes on iCal format.
 
 ```
 BEGIN:VEVENT
@@ -49,7 +33,7 @@ $ sudo gpasswd -a <USER> docker && echo "Login and then logout."
 
 # Run
 
-## Serve
+### Serve
 
 ```bash
 $ make server      # Serve site.
@@ -57,26 +41,26 @@ $ make watch-serve # Serve site, restarting when any files in the
                    # project directory change (requires inotifywait).
 ```
 
-## Auxiliary
+### Auxiliary
 
 ```bash
 $ make db-reset # Wipe the database.
 $ make test     # Run tests.
 ```
 
-## Docker
+### Docker
 
 ```bash
-$ make docker-deps # Pull, configure, and run the docker container dependencies (only run once).
+$ make docker-deps  # Pull, configure, and run the docker container dependencies (only run once).
 $ make docker-build # Build the docker container for the app.
-$ make docker-run # Run the docker container as a daemon.
+$ make docker-run   # Run the docker container as a daemon.
 ```
 
-## Deploy
+### Deploy
 
 ```bash
 $ make deploy-deps TO=<SSH-NAME> # Pull docker deps on SSH-NAME (only run once).
-$ make deploy TO=<SSH-NAME> # Push code to server and run docker.
+$ make deploy TO=<SSH-NAME>      # Push code to server and run docker.
 ```
 
 # LICENSE
