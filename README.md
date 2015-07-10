@@ -18,6 +18,7 @@ Next:
 
 Deploy on heroku?
 
+```
 BEGIN:VEVENT
 ORGANIZER;CN=<Owner>:MAILTO:noreply@facebookmail.com
 DTSTART - either yyyymmdd or yyyymmddThhmmssZ converted to UTC
@@ -31,27 +32,52 @@ CLASS:PUBLIC
 STATUS:CONFIRMED
 PARTSTAT:ACCEPTED
 END:VEVENT
-
-// func main() {
-// 	var woTimeLayout = "2006-01-02"
-// 	var wTimeLayout = "2006-01-02T15:04:05-0700"
-// 	var woTime = "2025-12-29"
-// 	var wTime = "2015-07-21T19:30:00-0700" // zoopolis
-// 	fmt.Println(time.Parse(woTimeLayout, woTime))
-	
-// 	t, _ := time.Parse(wTimeLayout, wTime)
-// 	fmt.Println(t.UTC().Format("20060102T150405Z"))
-// }
-
+```
 
 # Setup
 
-$ pacman -S postgres
+```bash
+$ sudo pacman -S postgres # Set up database.
 $ sudo -i -u postgres initdb --locale en_US.UTF-8 -E UTF8 -D '/var/lib/postgres/data'
 $ sudo systemctl start postgresql
 $ sudo systemctl enable postgresql
 $ sudo -i -u postgres createuser --interactive <your-system-username>
 $ createdb syncfbevents
+$ sudo pacman -S docker # Install docker.
+$ sudo gpasswd -a <USER> docker && echo "Login and then logout."
+```
+
+# Run
+
+## Serve
+
+```bash
+$ make server      # Serve site.
+$ make watch-serve # Serve site, restarting when any files in the
+                   # project directory change (requires inotifywait).
+```
+
+## Auxiliary
+
+```bash
+$ make db-reset # Wipe the database.
+$ make test     # Run tests.
+```
+
+## Docker
+
+```bash
+$ make docker-deps # Pull, configure, and run the docker container dependencies (only run once).
+$ make docker-build # Build the docker container for the app.
+$ make docker-run # Run the docker container as a daemon.
+```
+
+## Deploy
+
+```bash
+$ make deploy-deps TO=<SSH-NAME> # Pull docker deps on SSH-NAME (only run once).
+$ make deploy TO=<SSH-NAME> # Push code to server and run docker.
+```
 
 # LICENSE
 
