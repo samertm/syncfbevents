@@ -33,7 +33,13 @@ func TestToICalDateTime(t *testing.T) {
 	}
 	//toICalDateTime
 	for _, v := range vs {
-		iCalStart, iCalEnd, err := toICalDateTime(v.startTime, v.endTime)
+		startTimeParsed, err := parseFacebookDateTime(v.startTime)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		t.Logf("startTime %s parsed as %+v", v.startTime, startTimeParsed)
+		iCalStart, iCalEnd, err := toICalDateTime(startTimeParsed, v.endTime)
 		if err != nil {
 			t.Error(err)
 			continue

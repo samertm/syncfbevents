@@ -12,7 +12,7 @@ db-reset:
 	psql -d syncfbevents -c "create schema public"
 
 test:
-	go test ./...
+	go test $(ARGS) ./...
 
 docker-deps:
 	docker pull postgres
