@@ -1,4 +1,4 @@
-.PHONY: serve watch-serve db-reset test docker-deps docker-build docker-run deploy-deps deploy
+.PHONY: serve watch-serve db-reset test docker-deps docker-build docker-run deploy-deps deploy docker
 
 serve:
 	go install github.com/samertm/syncfbevents
@@ -32,6 +32,8 @@ docker-run:
 	-docker top sfe-app && docker stop sfe-app && docker rm sfe-app
 	docker run -d -p 8111:8000 --name sfe-app --link sfe-db:postgres sfe # Did you run 'make docker-build?'
 
+docker: docker-build docker-run
+
 # Must specify TO.
 deploy-deps:
 	rsync -azP . samertm:~/syncfbevents
@@ -40,4 +42,4 @@ deploy-deps:
 # Must specify TO.
 deploy:
 	rsync -azP . samertm:~/syncfbevents
-	ssh $(TO) 'cd ~/syncfbevents && make docker-build && make docker-run'
+	ssh $(TO) 'cd ~/syncfbevents && make docker'
