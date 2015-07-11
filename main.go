@@ -134,8 +134,8 @@ func serveFacebookCallback(c web.C, w http.ResponseWriter, r *http.Request) erro
 	return HTTPRedirect{To: "/", Code: http.StatusTemporaryRedirect}
 }
 
+// Handles "raw" query by spitting out raw Events list.
 func serveCalendar(c web.C, w http.ResponseWriter, r *http.Request) error {
-	//s := getSession(c) // SAMER: Do I need this?
 	fbID := c.URLParams["fbID"]
 	u, err := GetUser(UserSpec{FacebookID: fbID})
 	if err != nil {
@@ -165,9 +165,6 @@ outer:
 			if err := r.Decode(&e); err != nil {
 				return fmt.Errorf("Could not decode events: %s", err)
 			}
-			if e.RSVPStatus == "attending" {
-				allEvents = append(allEvents, e)
-			}
 			dt, err := parseFacebookDateTime(e.StartTime)
 			if err != nil {
 				return fmt.Errorf("Error during calendar generation: %s", err)
@@ -176,13 +173,21 @@ outer:
 			if e.startTimeParsed.T.Before(dateMarker) {
 				break outer
 			}
+			if e.RSVPStatus == "attending" {
+				allEvents = append(allEvents, e)
+			}
 		}
 		if !pr.HasNext() {
 			break
 		}
 		pr.Next()
 	}
-	cal, err := generateICal(fbID, allEvents)
+	if len(r.URL.Query()["raw"]) > 0 {
+		// The URL has the query "raw".
+		w.Write([]byte(fmt.Sprintf("%+v", allEvents)))
+		return nil
+	}
+	cal, err := generateICal(fbID, u.Name, allEvents)
 	if err != nil {
 		return fmt.Errorf("Error generating calendar for %s: %s", fbID, err)
 	}
@@ -191,10 +196,11 @@ outer:
 }
 
 // SAMER: Convert to CLRF at some point?
-func generateICal(fbID string, es []Event) ([]byte, error) {
+func generateICal(fbID, userName string, es []Event) ([]byte, error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(`BEGIN:VCALENDAR
 PRODID:-//Sync Events//NONSGML Sync Events V1.0//EN
+X-WR-CALNAME:` + userName + `'s Facebook Events -- Attending Only
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
