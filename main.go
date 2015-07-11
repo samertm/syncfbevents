@@ -46,6 +46,8 @@ type errorTemplateVars struct {
 	Message string
 }
 
+var privacyPolicyTemplate = initializeTemplate("templates/privacypolicy.html")
+
 func serveIndex(c web.C, w http.ResponseWriter, r *http.Request) error {
 	s := getSession(c)
 	u := getUser(s) // SAMER: Change to auth.
@@ -193,6 +195,10 @@ outer:
 	}
 	w.Write(cal)
 	return nil
+}
+
+func servePrivacyPolicy(c web.C, w http.ResponseWriter, r *http.Request) error {
+	return privacyPolicyTemplate.Execute(w, nil)
 }
 
 // SAMER: Convert to CLRF at some point?
@@ -485,5 +491,7 @@ func main() {
 	goji.Get("/login", handler(serveLogin))
 	goji.Get("/facebook_callback", handler(serveFacebookCallback))
 	goji.Get("/calendar/:fbID", handler(serveCalendar))
+	goji.Get("/privacypolicy", handler(servePrivacyPolicy))
+	goji.Get("/privacypolicy.html", handler(servePrivacyPolicy))
 	goji.Serve()
 }

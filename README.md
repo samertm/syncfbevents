@@ -55,6 +55,7 @@ $ make docker-deps  # Pull, configure, and run the docker
                     # container dependencies (only run once).
 $ make docker-build # Build the docker container for the app.
 $ make docker-run   # Run the docker container as a daemon.
+$ make docker       # Calls docker-build and docker-run.
 ```
 
 ### Deploy
