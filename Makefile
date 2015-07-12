@@ -1,4 +1,4 @@
-.PHONY: serve watch-serve db-reset test docker-deps docker-build docker-run deploy-deps deploy docker
+.PHONY: serve watch-serve db-reset test docker-deps docker-build docker-run deploy-deps deploy docker check-to
 
 serve:
 	go install github.com/samertm/syncfbevents
