@@ -15,31 +15,30 @@ test:
 	go test $(ARGS) ./...
 
 docker-deps:
-	docker pull postgres
-	docker run --name sfe-db -d postgres
-	sleep 5 # Wait for database to be created.
-	docker exec sfe-db psql -U postgres -c 'CREATE USER sfe'
-	docker exec sfe-db psql -U postgres -c 'CREATE DATABASE sfe'
-	docker exec sfe-db psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE sfe TO sfe'
-	docker stop sfe-db
-	docker start sfe-db
+	$(MAKE) -C postgres-docker docker-build
+	$(MAKE) -C postgres-docker run-prod
 
 docker-build:
 	docker build -t sfe .
 
 docker-run:
 	docker start sfe-db # Did you run 'make docker-deps'?
-	-docker top sfe-app && docker stop sfe-app && docker rm sfe-app
+	-docker top sfe-app && docker rm -f sfe-app
 	docker run -d -p 8111:8000 --name sfe-app --link sfe-db:postgres sfe # Did you run 'make docker-build?'
 
 docker: docker-build docker-run
 
 # Must specify TO.
-deploy-deps:
-	rsync -azP . samertm:~/syncfbevents
+deploy-deps: check-to
+	rsync -azP . $(TO):~/syncfbevents
 	ssh $(TO) 'cd ~/syncfbevents && make docker-deps'
 
 # Must specify TO.
-deploy:
-	rsync -azP . samertm:~/syncfbevents
+deploy: check-to
+	rsync -azP . $(TO):~/syncfbevents
 	ssh $(TO) 'cd ~/syncfbevents && make docker'
+
+check-to:
+	ifndef TO
+	    $(error TO is undefined)
+	endif
