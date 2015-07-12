@@ -8,8 +8,8 @@ watch-serve:
 	$(shell while true; do $(MAKE) serve & PID=$$! ; echo $$PID ; inotifywait --exclude ".git" -r -e close_write . ; kill $$PID ; done)
 
 db-reset:
-	psql -d syncfbevents -c "drop schema public cascade"
-	psql -d syncfbevents -c "create schema public"
+	psql -h localhost -U sfe -c "drop schema public cascade"
+	psql -h localhost -U sfe -c "create schema public"
 
 test:
 	go test $(ARGS) ./...
@@ -24,7 +24,7 @@ docker-build:
 docker-run:
 	docker start sfe-db # Did you run 'make docker-deps'?
 	-docker top sfe-app && docker rm -f sfe-app
-	docker run -d -p 8111:8000 --name sfe-app --link sfe-db:postgres sfe # Did you run 'make docker-build?'
+	docker run -d -p 8111:8000 --name sfe-app --link sfe-db:sfe-db sfe # Did you run 'make docker-build?'
 
 docker: docker-build docker-run
 
