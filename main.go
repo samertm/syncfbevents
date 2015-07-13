@@ -3,19 +3,16 @@ package main
 import (
 	"bytes"
 	"crypto/md5"
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
-	"text/template"
 	"time"
 
 	"github.com/gorilla/context"
-	"github.com/gorilla/sessions"
 	"github.com/huandu/facebook"
 	"github.com/samertm/syncfbevents/conf"
 	"github.com/zenazn/goji"
@@ -24,8 +21,11 @@ import (
 	facebookoauth "golang.org/x/oauth2/facebook"
 )
 
-func absoluteURL(urlFragment string) string {
-	return conf.Config.BaseURL + "/" + strings.TrimPrefix(urlFragment, "/")
+var errorTemplate = initializeTemplate("templates/error.html")
+
+type errorTemplateVars struct {
+	Code    int
+	Message string
 }
 
 func initializeTemplate(file string) *template.Template {
@@ -38,15 +38,6 @@ type indexTemplateVars struct {
 	Name        string
 	CalendarURL string
 }
-
-var errorTemplate = initializeTemplate("templates/error.html")
-
-type errorTemplateVars struct {
-	Code    int
-	Message string
-}
-
-var privacyPolicyTemplate = initializeTemplate("templates/privacypolicy.html")
 
 func serveIndex(c web.C, w http.ResponseWriter, r *http.Request) error {
 	s := getSession(c)
@@ -196,6 +187,8 @@ outer:
 	w.Write(cal)
 	return nil
 }
+
+var privacyPolicyTemplate = initializeTemplate("templates/privacypolicy.html")
 
 func servePrivacyPolicy(c web.C, w http.ResponseWriter, r *http.Request) error {
 	return privacyPolicyTemplate.Execute(w, nil)
@@ -405,52 +398,6 @@ type EventPlace struct {
 	Name string `facebook:"name"`
 }
 
-type HTTPRedirect struct {
-	To   string
-	Code int
-}
-
-func (e HTTPRedirect) Error() string {
-	return fmt.Sprintf("Redirect code %d to %s", e.Code, e.To)
-}
-
-func handler(fn func(web.C, http.ResponseWriter, *http.Request) error) web.HandlerType {
-	return func(c web.C, w http.ResponseWriter, r *http.Request) {
-		err := fn(c, w, r)
-		if err != nil {
-			if e, ok := err.(HTTPRedirect); ok {
-				http.Redirect(w, r, e.To, e.Code)
-				return
-			}
-			w.WriteHeader(500)
-			errorTemplate.Execute(w, errorTemplateVars{
-				Message: err.Error(),
-				Code:    500,
-			})
-		}
-	}
-}
-
-var userIDSessionKey = "user_id"
-
-func getUser(s *sessions.Session) *User {
-	id, ok := s.Values[userIDSessionKey]
-	if !ok {
-		return nil
-	}
-	// SAMER: Put a DB lookup here.
-	u, err := GetUser(UserSpec{ID: id.(int)})
-	if err != nil {
-		log.Printf("Error getting user (id %d): %s\n", id, err)
-		return nil
-	}
-	return &u
-}
-
-func getSession(c web.C) *sessions.Session {
-	return c.Env["session"].(*sessions.Session)
-}
-
 var (
 	oauthConf = &oauth2.Config{
 		ClientID:     conf.Config.FacebookID,
@@ -459,20 +406,9 @@ var (
 		Scopes:       []string{"user_events"},
 		Endpoint:     facebookoauth.Endpoint,
 	}
-	oauthStateString = "somerandomstring"
+	oauthStateString = conf.Config.OAuthStateString
 	fb               = facebook.New(conf.Config.FacebookID, conf.Config.FacebookSecret)
 )
-
-func applySessions(c *web.C, h http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		session, _ := store.Get(r, "session")
-		c.Env["session"] = session
-		h.ServeHTTP(w, r)
-	}
-	return http.HandlerFunc(fn)
-}
-
-var store = sessions.NewCookieStore(sha256.New().Sum(nil)) // SAMER: Make this secure.
 
 func main() {
 	// Serve static files.

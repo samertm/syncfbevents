@@ -13,6 +13,8 @@ type ConfigVars struct {
 	FacebookSecret     string
 	BaseURL            string
 	PostgresDataSource string
+	SessionKey         string
+	OAuthStateString   string
 }
 
 var Config ConfigVars
