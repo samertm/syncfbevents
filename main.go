@@ -61,7 +61,7 @@ func serveLogin(c web.C, w http.ResponseWriter, r *http.Request) error {
 	url := oauthConf.AuthCodeURL(oauthStateString, oauth2.AccessTypeOnline)
 	return HTTPRedirect{
 		To:   url,
-		Code: http.StatusTemporaryRedirect,
+		Code: http.StatusSeeOther,
 	}
 }
 
@@ -124,7 +124,7 @@ func serveFacebookCallback(c web.C, w http.ResponseWriter, r *http.Request) erro
 	if err := s.Save(r, w); err != nil {
 		log.Println(err)
 	}
-	return HTTPRedirect{To: "/", Code: http.StatusTemporaryRedirect}
+	return HTTPRedirect{To: "/", Code: http.StatusSeeOther}
 }
 
 // Handles "raw" query by spitting out raw Events list.
