@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/context"
+	"github.com/gorilla/schema"
 	"github.com/huandu/facebook"
 	"github.com/samertm/syncfbevents/conf"
 	"github.com/zenazn/goji"
@@ -46,7 +47,7 @@ func serveIndex(c web.C, w http.ResponseWriter, r *http.Request) error {
 	if u != nil {
 		v.Name = u.Name
 		// SAMER: Reverse router?
-		rawurl := absoluteURL(fmt.Sprintf("/calendar/%s", u.FacebookID))
+		rawurl := absoluteURL(fmt.Sprintf("/calendar/%s?key=%s", u.FacebookID, u.SecretKey()))
 		calURL, err := url.Parse(rawurl)
 		if err != nil {
 			return err
@@ -127,12 +128,25 @@ func serveFacebookCallback(c web.C, w http.ResponseWriter, r *http.Request) erro
 	return HTTPRedirect{To: "/", Code: http.StatusSeeOther}
 }
 
+type calendarQuery struct {
+	Key string `schema:"key"`
+	Raw bool   `schema:"raw"`
+}
+
 // Handles "raw" query by spitting out raw Events list.
 func serveCalendar(c web.C, w http.ResponseWriter, r *http.Request) error {
 	fbID := c.URLParams["fbID"]
 	u, err := GetUser(UserSpec{FacebookID: fbID})
 	if err != nil {
 		return err
+	}
+	var query calendarQuery
+	if err := schema.NewDecoder().Decode(&query, r.URL.Query()); err != nil {
+		return err
+	}
+	// Check that the user's secret key is valid.
+	if query.Key != u.SecretKey() {
+		return fmt.Errorf("User %d has invalid key for URL %q", u.ID, r.URL)
 	}
 	// Check to see if the user has a valid access token.
 	if !u.AccessToken.Valid || u.ExpiresOn == nil || u.ExpiresOn.Before(time.Now()) {
@@ -175,7 +189,7 @@ outer:
 		}
 		pr.Next()
 	}
-	if len(r.URL.Query()["raw"]) > 0 {
+	if query.Raw {
 		// The URL has the query "raw".
 		w.Write([]byte(fmt.Sprintf("%+v", allEvents)))
 		return nil

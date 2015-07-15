@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
@@ -16,7 +18,6 @@ type User struct {
 	FacebookID  string         `db:"facebook_id"`
 	AccessToken sql.NullString `db:"access_token"`
 	ExpiresOn   *time.Time     `db:"expires_on"`
-	// SAMER: Access token expiration date.
 }
 
 var userSchema = `
@@ -31,6 +32,13 @@ CREATE TABLE IF NOT EXISTS person (
 
 func init() {
 	db.DB.MustExec(userSchema)
+}
+
+func (u User) SecretKey() string {
+	m := md5.New()
+	m.Write([]byte(strconv.Itoa(u.ID)))
+	m.Write([]byte(u.FacebookID))
+	return hex.EncodeToString(m.Sum(nil))
 }
 
 type UserSpec struct {
