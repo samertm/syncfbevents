@@ -14,4 +14,9 @@ EOSQL
 { gosu postgres postgres --single -jE <<-EOSQL
     GRANT ALL PRIVILEGES ON DATABASE "$DB_NAME" TO "$DB_USER";
 EOSQL
+} &&
+{ gosu postgres postgres --single -jE <<-EOSQL
+    ALTER ROLE "$DB_USER" superuser;
+EOSQL
 }
+
