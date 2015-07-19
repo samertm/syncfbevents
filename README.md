@@ -2,6 +2,8 @@
 
 # Notes on iCal format.
 
+Note: clean this up
+
 ```
 BEGIN:VEVENT
 ORGANIZER;CN=<Owner>:MAILTO:noreply@facebookmail.com
